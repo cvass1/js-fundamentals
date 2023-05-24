@@ -1,5 +1,6 @@
 const { describe } = require('node:test')
-const Thermostat = require('./thermostat.js') 
+const Thermostat = require('./thermostat.js'); 
+const { listenerCount } = require('stream');
 
 describe('Thermostat', () => {
     it('returns the default temperature', () => {
@@ -57,6 +58,34 @@ describe('Thermostat', () => {
         };
         thermostat.reset();
         expect(thermostat.getTemperature()).toBe(20);
+    });
+
+    it('has a minimum temp of 10', () => {
+        const thermostat = new Thermostat();
+        for (let i = 0; i< 20; i++){
+            thermostat.down();
+        };
+        expect(thermostat.getTemperature()).toBe(10);
+    });
+
+    it('displays energy usage', () => {
+        const thermostat = new Thermostat();
+        for (let i = 0; i< 8; i++){
+            thermostat.down();
+        };
+        expect(thermostat.energyUsage()).toBe('low-usage');
+        for (let i = 0; i< 8; i++){
+            thermostat.up();
+        };
+
+        expect(thermostat.energyUsage()).toBe('medium-usage');
+
+        thermostat.setPowerSavingMode(false);
+        for (let i = 0; i< 10; i++){
+            thermostat.up();
+        };
+        expect(thermostat.energyUsage()).toBe('high-usage');
+
     });
 
 });
